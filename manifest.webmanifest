@@ -1,0 +1,21 @@
+{
+  "name": "EcoTrack — Carbon Footprint Assistant",
+  "short_name": "EcoTrack",
+  "description": "Estimate, track, and reduce your personal carbon footprint with a smart, interactive action plan.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7faf8",
+  "theme_color": "#15803d",
+  "lang": "en",
+  "categories": ["lifestyle", "utilities", "education"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

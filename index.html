@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="EcoTrack — a smart personal carbon footprint assistant. Estimate your emissions, set a goal, and get a personalized, interactive plan to reach it."
+    />
+    <meta name="theme-color" content="#15803d" />
+    <title>EcoTrack — Personal Carbon Footprint Assistant</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#assessment">Skip to the assessment form</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <div>
+          <p class="brand"><span aria-hidden="true">🌱</span> EcoTrack</p>
+          <p class="tagline">
+            Understand, track, and reduce your carbon footprint — with a plan
+            built around your life.
+          </p>
+        </div>
+        <button id="install" class="btn btn-install" type="button" hidden>
+          ⬇️ Install app
+        </button>
+      </div>
+    </header>
+
+    <main class="wrap layout" id="main">
+      <!-- ============================ INPUT ============================ -->
+      <section id="assessment" aria-labelledby="assessment-title" class="card">
+        <h1 id="assessment-title">Your footprint assessment</h1>
+        <p class="muted">
+          Enter what you know — leave anything blank as zero. Or start from an
+          example and tweak it.
+        </p>
+
+        <div class="presets" role="group" aria-label="Quick-start examples">
+          <span class="presets-label">Quick start:</span>
+          <button type="button" class="chip" data-preset="commuter">🚗 Car commuter</button>
+          <button type="button" class="chip" data-preset="flyer">✈️ Frequent flyer</button>
+          <button type="button" class="chip" data-preset="green">🌿 Eco-conscious</button>
+        </div>
+
+        <form id="footprint-form" novalidate>
+          <div class="field">
+            <label for="period">I'm entering my usage per</label>
+            <select id="period" name="period">
+              <option value="day">day</option>
+              <option value="week">week</option>
+              <option value="month" selected>month</option>
+              <option value="year">year</option>
+            </select>
+            <p class="hint" id="period-hint">
+              Travel and energy figures use this period. Flights and lifestyle
+              choices are counted per year.
+            </p>
+          </div>
+
+          <fieldset>
+            <legend>🚗 Transport</legend>
+
+            <div class="field">
+              <label for="carKm">Distance driven by car (km)</label>
+              <input id="carKm" name="carKm" type="number" min="0" step="any" inputmode="decimal" value="0" />
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="carFuel">Car fuel type</label>
+                <select id="carFuel" name="carFuel">
+                  <option value="petrol">Petrol</option>
+                  <option value="diesel">Diesel</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="electric">Electric</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="carOccupancy">People usually in the car</label>
+                <input id="carOccupancy" name="carOccupancy" type="number" min="1" step="1" inputmode="numeric" value="1" />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="busKm">Distance by bus (km)</label>
+                <input id="busKm" name="busKm" type="number" min="0" step="any" inputmode="decimal" value="0" />
+              </div>
+              <div class="field">
+                <label for="trainKm">Distance by train (km)</label>
+                <input id="trainKm" name="trainKm" type="number" min="0" step="any" inputmode="decimal" value="0" />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="flightsShortPerYear">Short-haul flights / year</label>
+                <input id="flightsShortPerYear" name="flightsShortPerYear" type="number" min="0" step="1" inputmode="numeric" value="0" />
+                <p class="hint">Return trips under ~1,500 km.</p>
+              </div>
+              <div class="field">
+                <label for="flightsLongPerYear">Long-haul flights / year</label>
+                <input id="flightsLongPerYear" name="flightsLongPerYear" type="number" min="0" step="1" inputmode="numeric" value="0" />
+                <p class="hint">Return intercontinental trips.</p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>🏠 Home energy</legend>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="electricityKwh">Electricity used (kWh)</label>
+                <input id="electricityKwh" name="electricityKwh" type="number" min="0" step="any" inputmode="decimal" value="0" />
+              </div>
+              <div class="field">
+                <label for="gridRegion">Where you live (electricity grid)</label>
+                <select id="gridRegion" name="gridRegion">
+                  <option value="world" selected>World average</option>
+                  <option value="us">United States</option>
+                  <option value="eu">European Union</option>
+                  <option value="uk">United Kingdom</option>
+                  <option value="india">India</option>
+                  <option value="australia">Australia</option>
+                  <option value="renewable">100% renewable tariff</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="naturalGasKwh">Natural gas used (kWh)</label>
+                <input id="naturalGasKwh" name="naturalGasKwh" type="number" min="0" step="any" inputmode="decimal" value="0" />
+              </div>
+              <div class="field">
+                <label for="householdSize">People in your household</label>
+                <input id="householdSize" name="householdSize" type="number" min="1" step="1" inputmode="numeric" value="1" />
+              </div>
+            </div>
+            <p class="hint">Home energy is shared and split across everyone in the household.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>🍽️ Food &amp; diet</legend>
+            <div class="field">
+              <label for="dietType">Which best describes how you eat?</label>
+              <select id="dietType" name="dietType">
+                <option value="meatHeavy">Meat with most meals</option>
+                <option value="average" selected>Average mixed diet</option>
+                <option value="lowMeat">Meat a few times a week</option>
+                <option value="pescatarian">Pescatarian (fish, no meat)</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan / plant-based</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>🛍️ Lifestyle</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="shoppingLevel">How much do you buy (clothes, gadgets, goods)?</label>
+                <select id="shoppingLevel" name="shoppingLevel">
+                  <option value="low">Rarely — second-hand, repair</option>
+                  <option value="average" selected>Average</option>
+                  <option value="high">Often — frequent new purchases</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="wasteLevel">Household waste produced</label>
+                <select id="wasteLevel" name="wasteLevel">
+                  <option value="low">Low</option>
+                  <option value="average" selected>Average</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+            <div class="field checkbox">
+              <input id="recycles" name="recycles" type="checkbox" />
+              <label for="recycles">I recycle and compost regularly</label>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">Calculate my footprint</button>
+            <button type="reset" class="btn btn-ghost">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- =========================== RESULTS =========================== -->
+      <section id="results" class="card results" aria-labelledby="results-title" tabindex="-1" hidden>
+        <h2 id="results-title">Your results</h2>
+
+        <div class="result-total">
+          <p class="total-number"><span id="total-tonnes">0.0 t</span> CO₂e / year</p>
+          <p class="rating">Rating: <span id="rating-badge" class="badge">—</span></p>
+        </div>
+
+        <p id="headline" class="headline"></p>
+
+        <div class="assistant-note">
+          <span class="assistant-avatar" aria-hidden="true">🌱</span>
+          <p id="coaching" class="coaching"></p>
+        </div>
+
+        <h3>Where it comes from</h3>
+        <ul id="breakdown" class="breakdown" aria-label="Footprint by category"></ul>
+
+        <div id="benchmark" class="benchmark"></div>
+
+        <h3 id="plan-title">Your interactive action plan</h3>
+
+        <fieldset class="goal-picker">
+          <legend>🎯 My goal</legend>
+          <div id="goal-options" class="goal-options"></div>
+          <div class="field custom-goal" id="custom-goal-wrap" hidden>
+            <label for="custom-goal">Custom target (tonnes CO₂e / year)</label>
+            <input id="custom-goal" type="number" min="0" step="0.1" inputmode="decimal" />
+          </div>
+        </fieldset>
+
+        <div id="gauge" class="gauge"></div>
+        <p id="goal-message" class="goal-message" role="status" aria-live="polite"></p>
+
+        <p class="muted">
+          Tick the actions you’ll commit to — your projection updates instantly.
+        </p>
+        <ol id="recommendations" class="recommendations" aria-label="Recommended actions"></ol>
+
+        <div class="actions">
+          <button type="button" id="save-entry" class="btn btn-primary">Save this to my tracker</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============================ TRACKER ============================ -->
+    <section id="tracker" class="wrap card tracker" aria-labelledby="tracker-title" hidden>
+      <h2 id="tracker-title">📈 Your progress over time</h2>
+      <p class="muted">Saved snapshots stay on this device only.</p>
+      <p id="progress-msg" class="progress-msg" role="status"></p>
+      <div id="trend" class="trend"></div>
+      <ul id="history" class="history" aria-label="Saved footprint history"></ul>
+      <div class="actions">
+        <button type="button" id="export-data" class="btn btn-ghost">⬇️ Export my data</button>
+        <button type="button" id="clear-history" class="btn btn-ghost">Clear history</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          <strong>How this works:</strong> EcoTrack multiplies your inputs by
+          published average emission factors (DEFRA, IEA, Our World in Data) to
+          estimate your yearly CO₂e, then builds an interactive plan ranked by
+          impact for <em>your</em> situation. Figures are estimates for guidance,
+          not audit-grade accounting.
+        </p>
+        <p class="muted">
+          🔒 Privacy-first: everything runs in your browser. No account, no
+          servers, no tracking — your data never leaves your device.
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

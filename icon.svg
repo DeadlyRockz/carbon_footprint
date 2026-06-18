@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="EcoTrack leaf">
+  <rect width="512" height="512" rx="96" fill="#15803d" />
+  <path
+    d="M352 128c0 96-64 176-160 200-8-72 24-136 80-168-64 16-112 64-128 128-8-24-8-48 0-72-32 48-40 112-16 168 8 16 24 24 40 24 120 0 200-104 184-232z"
+    fill="#dcfce7"
+  />
+  <path d="M196 392c24-72 72-128 132-160" stroke="#15803d" stroke-width="14" fill="none" stroke-linecap="round" />
+</svg>
