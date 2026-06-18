@@ -119,3 +119,36 @@ test('the limit option caps the number of recommendations', () => {
   const plan = recommend(profile, footprint, { limit: 3 });
   assert.equal(plan.recommendations.length, 3);
 });
+
+test('an action whose applies() throws is skipped, never crashes the engine', () => {
+  // Malformed footprint: transport parts are missing, so transport actions'
+  // applies() dereference undefined. The engine must swallow that and continue.
+  const footprint = {
+    period: 'year',
+    total: 5000,
+    categories: { transport: 0, home: 0, diet: 0, shopping: 0, waste: 0 },
+    details: { transport: {}, home: { parts: {} } },
+  };
+  const result = recommend(createDefaultProfile(), footprint);
+  assert.ok(Array.isArray(result.recommendations), 'returns a plan instead of throwing');
+});
+
+test('an action whose saving() throws is dropped, not surfaced', () => {
+  // diet category as a BigInt: food-waste.applies (2000n > 1000) is true, but its
+  // saving (2000n * 0.08) throws on a BigInt×number mix — it must be dropped.
+  // A vegan profile suppresses the diet-shift action so the BigInt category is
+  // only ever touched by the throwing action, not by the downstream projection.
+  const profile = createDefaultProfile();
+  profile.diet.type = 'vegan';
+  const footprint = {
+    period: 'year',
+    total: 5000,
+    categories: { diet: 2000n },
+    details: { transport: { parts: {} }, home: { parts: {} } },
+  };
+  const result = recommend(profile, footprint);
+  assert.ok(
+    !result.recommendations.some((r) => r.id === 'food-waste'),
+    'the throwing action contributes nothing',
+  );
+});

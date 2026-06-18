@@ -12,6 +12,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, normalize, extname } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const ROOT = normalize(join(dirname(fileURLToPath(import.meta.url)), '..'));
 const PORT = Number(process.env.PORT) || 4173;
@@ -39,9 +40,20 @@ const server = createServer(async (req, res) => {
     }
 
     const body = await readFile(filePath);
+
+    // Compute simple content hash for ETag validation
+    const hash = createHash('sha1').update(body).digest('base64');
+    const etag = `"${hash}"`;
+
+    if (req.headers['if-none-match'] === etag) {
+      res.writeHead(304).end();
+      return;
+    }
+
     res.writeHead(200, {
       'Content-Type': MIME[extname(filePath)] ?? 'application/octet-stream',
       'Cache-Control': 'no-cache',
+      ETag: etag,
     });
     res.end(body);
   } catch {

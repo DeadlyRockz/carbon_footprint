@@ -26,7 +26,7 @@ import {
   CATEGORY_LABELS,
 } from './calculator.js';
 import { projectFootprint } from './planner.js';
-import { roundTo as round } from './math.js';
+import { roundTo } from './math.js';
 
 /** Effort levels lightly bias ranking toward easy wins. */
 const EFFORT_WEIGHT = Object.freeze({ low: 1, medium: 0.85, high: 0.7 });
@@ -306,7 +306,7 @@ export function recommend(profile, footprint, { limit = 6 } = {}) {
 
   const candidates = ACTIONS.filter((action) => safeApplies(action, context))
     .map((action) => {
-      const saving = Math.max(0, round(safeSaving(action, context)));
+      const saving = Math.max(0, roundTo(safeSaving(action, context)));
       return {
         id: action.id,
         category: action.category,

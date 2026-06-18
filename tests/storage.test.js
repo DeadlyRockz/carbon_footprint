@@ -51,3 +51,41 @@ test('loadHistory recovers from corrupt stored data', () => {
   localStorage.setItem('ecotrack:history', '{not valid json');
   assert.deepEqual(loadHistory(), [], 'falls back to an empty array, never throws');
 });
+
+test('storage that throws on probe is treated as unavailable', () => {
+  const original = globalThis.localStorage;
+  // Simulates a SecurityError (e.g. cookies disabled / strict private mode):
+  // even the probe write throws, so the layer must report itself unusable.
+  globalThis.localStorage = {
+    getItem: () => null,
+    removeItem: () => {},
+    setItem() {
+      throw new Error('SecurityError');
+    },
+  };
+  assert.equal(isStorageAvailable(), false);
+  assert.equal(saveProfile({ a: 1 }), false, 'save fails quietly, never throws');
+  assert.deepEqual(loadHistory(), [], 'reads fall back too');
+  globalThis.localStorage = original;
+});
+
+test('a write that exceeds quota fails quietly without throwing', () => {
+  const original = globalThis.localStorage;
+  const probeKey = '__ecotrack_probe__';
+  // The probe succeeds (so storage looks available), but persisting real data
+  // throws — exercising writeJson's defensive catch.
+  globalThis.localStorage = {
+    getItem: () => null,
+    removeItem: () => {},
+    setItem(key) {
+      if (key === probeKey) return;
+      throw new Error('QuotaExceededError');
+    },
+  };
+  assert.equal(isStorageAvailable(), true, 'probe write is accepted');
+  assert.equal(saveProfile({ big: 'data' }), false, 'the real write fails gracefully');
+  // addHistoryEntry still returns the would-be list even when it cannot persist.
+  const result = addHistoryEntry({ date: '2026-01-01', total: 1000, categories: {} });
+  assert.equal(result.length, 1);
+  globalThis.localStorage = original;
+});

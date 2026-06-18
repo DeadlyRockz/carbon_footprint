@@ -56,3 +56,8 @@ test('progressMessage distinguishes baseline, improvement and regression', () =>
   assert.ok(/progress|down/i.test(progressMessage(4000, 5000)));
   assert.ok(/up|reverse/i.test(progressMessage(5200, 5000)));
 });
+
+test('progressMessage acknowledges a flat result within the ±1 kg deadband', () => {
+  assert.ok(/about the same/i.test(progressMessage(5000, 5000)));
+  assert.ok(/about the same/i.test(progressMessage(5000.5, 5000)), 'sub-kg drift counts as steady');
+});

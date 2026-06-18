@@ -12,7 +12,7 @@
  * user toggles. All functions are pure for easy testing.
  */
 
-import { roundTo as round } from './math.js';
+import { roundTo } from './math.js';
 
 /**
  * Project the footprint that results from applying a chosen set of actions.
@@ -35,13 +35,13 @@ export function projectFootprint(footprint, recommendations, selectedIds) {
   let totalSaving = 0;
   for (const [category, saved] of Object.entries(rawByCategory)) {
     const capped = Math.min(saved, footprint.categories[category] ?? 0);
-    savingByCategory[category] = round(capped);
+    savingByCategory[category] = roundTo(capped);
     totalSaving += capped;
   }
 
-  totalSaving = round(totalSaving);
+  totalSaving = roundTo(totalSaving);
   return {
-    projectedTotal: round(Math.max(0, footprint.total - totalSaving)),
+    projectedTotal: roundTo(Math.max(0, footprint.total - totalSaving)),
     totalSaving,
     savingByCategory,
   };
@@ -79,8 +79,8 @@ export function goalStatus(projectedTotal, targetKg) {
   const target = Math.max(0, Number(targetKg) || 0);
   return {
     reached: projected <= target,
-    gap: round(Math.max(0, projected - target)),
-    overshoot: round(Math.max(0, target - projected)),
+    gap: roundTo(Math.max(0, projected - target)),
+    overshoot: roundTo(Math.max(0, target - projected)),
     targetKg: target,
   };
 }
@@ -101,7 +101,7 @@ export function goalPresets(footprintTotal, benchmarks) {
       id: 'halve',
       label: 'Halve my footprint',
       detail: 'A bold, motivating personal cut',
-      targetKg: round(footprintTotal / 2),
+      targetKg: roundTo(footprintTotal / 2),
     },
     {
       id: 'sustainable',

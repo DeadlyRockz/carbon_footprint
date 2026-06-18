@@ -30,7 +30,9 @@ that helps you hit a climate goal.
 5. **Tracks progress** with on-device snapshots and an SVG trend chart, plus
    motivational feedback on each change.
 6. **Works anywhere.** Installable PWA, fully offline, zero dependencies, and
-   100% private — your data never leaves your device.
+   100% private — your data never leaves your device. Honours the system
+   light/dark theme, and the service worker auto-versions itself on every build
+   so updates reach installed devices without a stale cache.
 
 The assistant is genuinely context-driven: an EV owner is never told to "switch
 to an EV," a vegan is never told to eat less meat, someone who already recycles
@@ -49,8 +51,11 @@ you change your goal.
 # Option 2 — serve it (Node 18+)
 npm start          # → http://localhost:4173
 
-# Run the test suite (64 unit + integration tests, Node's built-in runner)
+# Run the test suite (72 unit + integration tests, Node's built-in runner)
 npm test
+
+# ...with coverage (100% lines & functions across src/)
+node --test --experimental-test-coverage
 
 # Code-quality tooling (dev-only; the app itself ships zero dependencies)
 npm run lint           # ESLint — correctness
@@ -67,28 +72,35 @@ npm run format:check   # Prettier — formatting
 
 ## 🧠 Architecture
 
-The codebase is deliberately split into **pure logic** (no DOM, fully testable)
-and a **thin UI layer**.
+The codebase is deliberately split into **pure logic** (`core/` — no DOM, fully
+testable) and a **thin view layer** (`ui/` — the only DOM-aware code), wired
+together by a slim controller. No file mixes calculation with rendering.
 
 ```
 src/
   data/emissionFactors.js   Documented, sourced emission factors & benchmarks
-  core/
-    calculator.js           Profile -> annualized CO₂e breakdown (pure)
-    benchmarks.js           Footprint -> rating, target gap, comparisons (pure)
-    recommendations.js      Context-aware action engine (pure) — the "brain"
-    planner.js              Goal planning + live what-if projection (pure)
-    insights.js             Natural-language coaching, rule-based (pure)
+  core/                     Pure logic — no DOM, fully unit-tested
+    calculator.js           Profile -> annualized CO₂e breakdown
+    benchmarks.js           Footprint -> rating, target gap, comparisons
+    recommendations.js      Context-aware action engine — the "brain"
+    planner.js              Goal planning + live what-if projection
+    insights.js             Natural-language coaching, rule-based
     storage.js              Defensive localStorage wrapper (privacy-first)
-    format.js               Shared number/text formatting (pure)
+    format.js               Shared number/text formatting
     math.js                 Shared rounding helper (single source of truth)
+  ui/                       Thin view layer — the only DOM-aware code
+    dom.js                  Injection-safe element builder + DOM helpers
+    state.js                Single source of truth for the current result/plan
+    form.js                 Form <-> profile mapping (+ input sanitisation)
+    render.js               Results view + live what-if interactions
+    tracker.js              Saved-history list + trend chart
+    chart.js                Tiny accessible SVG line chart (pure geometry)
   presets.js                Quick-start example lifestyles
-  chart.js                  Tiny accessible SVG trend chart (pure geometry)
-  app.js                    Wires the form to the engines, renders safely
+  app.js                    Controller: wires form/buttons to engines & views
   styles.css                Accessible, responsive styling
 index.html                  Semantic, labelled, keyboard-friendly UI
 manifest.webmanifest, sw.js, icon.svg   PWA: installable + offline
-tests/                      64 unit + integration tests
+tests/                      72 unit + integration tests (100% line coverage)
 scripts/serve.js            Minimal static server with path-traversal guard
 scripts/build.js            Zero-dependency ES-module -> classic-script bundler
 eslint.config.js, .prettierrc.json      Lint + format config (dev-only)
@@ -167,7 +179,7 @@ Poore & Nemecek (2018) on food, and Our World in Data per-capita figures.
   data never leaves the device.
 - **Efficiency** — zero dependencies, no build, instant load, offline-capable;
   bounded on-device history; pure functions trivial to memoize or offload.
-- **Testing** — 64 unit + integration tests covering calculation, benchmarks,
+- **Testing** — 72 unit + integration tests covering calculation, benchmarks,
   the context-driven recommendation logic, the planner/what-if invariants,
   chart geometry, presets, NL coaching, shared helpers, the storage layer (both
   the persist/trim happy path and graceful degradation), and the full UI data
@@ -175,7 +187,8 @@ Poore & Nemecek (2018) on food, and Our World in Data per-capita figures.
 - **Accessibility** — semantic landmarks, a skip link, labelled `fieldset`/
   `legend` groups, real `<label>`s on every control, visible focus styles,
   `aria-live` result/gauge announcements, text-not-just-color charts, and
-  `prefers-reduced-motion` / `forced-colors` support.
+  `prefers-reduced-motion` / `prefers-color-scheme` (native dark mode) /
+  `forced-colors` support. Dark-theme colours keep WCAG AA contrast.
 
 ---
 

@@ -6,7 +6,7 @@
  * plus a descriptive label) and is only called in the browser.
  */
 
-import { roundTo } from './core/math.js';
+import { roundTo } from '../core/math.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -92,7 +92,7 @@ export function lineChartSVG(values, opts = {}) {
   return svg;
 }
 
-function describeSeries(values) {
+export function describeSeries(values) {
   const nums = (values ?? []).map((v) => Number(v) || 0);
   if (!nums.length) return 'No data yet';
   const latest = nums.at(-1).toFixed(1);

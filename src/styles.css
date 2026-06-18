@@ -3,7 +3,7 @@
 
 :root {
   --green-900: #14532d;
-  --green-700: #15803d;
+  --green-700: #166534;
   --green-600: #16a34a;
   --green-100: #dcfce7;
   --green-50: #f0fdf4;
@@ -17,6 +17,54 @@
   --shadow: 0 1px 3px rgba(16, 40, 24, 0.08), 0 6px 20px rgba(16, 40, 24, 0.06);
   --radius: 14px;
   --focus: #1d4ed8;
+
+  /* Semantic surface tokens — these flip in the dark-theme block below so the
+     whole UI can re-theme by overriding variables rather than duplicating rules. */
+  --field-bg: #ffffff; /* number/select input background */
+  --field-border: #b9c8bd; /* number/select input border */
+  --track: #eef2ef; /* bar / gauge track background */
+  --panel: #f3f7f4; /* benchmark & trend-chart panel background */
+  --marker: #0f172a; /* gauge target needle */
+  --accent-text: var(--green-900); /* deep-green text drawn on light-green tints */
+  --positive: var(--green-700); /* savings / downward-trend text */
+  --note-grad: linear-gradient(135deg, #f0fdf4, #ecfeff); /* coaching note backdrop */
+}
+
+/* --- Dark theme — honours the OS / browser colour-scheme preference.
+   Only the design tokens change; every component rule above reuses them, so the
+   light and dark themes never drift apart. Colours keep WCAG AA contrast. --- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --green-600: #22c55e; /* brighter accent so fills/lines read on a dark bg */
+    --green-100: #1f3a2b; /* light-green tints become deep-green tints */
+    --green-50: #15231b;
+    --ink: #e6efe9;
+    --muted: #a3b4aa;
+    --bg: #0e1310;
+    --card: #161e19;
+    --border: #29372f;
+    --amber: #fbbf24;
+    --red: #fca5a5;
+    --focus: #93c5fd;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 6px 22px rgba(0, 0, 0, 0.45);
+
+    --field-bg: #0d1310;
+    --field-border: #38483f;
+    --track: #243029;
+    --panel: #131b16;
+    --marker: #e2e8f0;
+    --accent-text: #86efac; /* light green for legibility on dark tints */
+    --positive: #4ade80;
+    --note-grad: linear-gradient(135deg, #15241c, #102a2a);
+  }
+
+  /* Trend dots use the deep greens, which vanish on the dark panel — brighten. */
+  .trend-dot {
+    fill: #34d399;
+  }
+  .trend-dot--last {
+    fill: #86efac;
+  }
 }
 
 * {
@@ -25,6 +73,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Render native form controls, scrollbars, etc. in the matching scheme. */
+  color-scheme: light dark;
 }
 
 body {
@@ -52,6 +102,9 @@ body {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
   border-radius: 4px;
+}
+#assessment:focus {
+  outline: none;
 }
 
 /* Visually hidden but available to assistive tech (e.g. live announcements). */
@@ -204,9 +257,9 @@ select {
   width: 100%;
   font: inherit;
   padding: 0.55rem 0.65rem;
-  border: 1px solid #b9c8bd;
+  border: 1px solid var(--field-border);
   border-radius: 9px;
-  background: #fff;
+  background: var(--field-bg);
   color: var(--ink);
 }
 input[type='number']:focus,
@@ -262,7 +315,7 @@ select:focus {
   background: var(--green-900);
 }
 .btn-ghost {
-  background: #fff;
+  background: var(--card);
   border-color: var(--border);
   color: var(--ink);
 }
@@ -290,7 +343,7 @@ select:focus {
 #total-tonnes {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--green-900);
+  color: var(--accent-text);
 }
 .rating {
   margin: 0;
@@ -354,7 +407,7 @@ select:focus {
 }
 .bar-track {
   height: 14px;
-  background: #eef2ef;
+  background: var(--track);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -369,7 +422,7 @@ select:focus {
 .benchmark {
   margin-top: 1.2rem;
   padding: 0.9rem 1rem;
-  background: #f3f7f4;
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 0.92rem;
@@ -403,7 +456,7 @@ select:focus {
   border-left: 4px solid var(--green-600);
   border-radius: 10px;
   padding: 0.85rem 1rem;
-  background: #fff;
+  background: var(--card);
 }
 .rec-head {
   display: flex;
@@ -418,7 +471,7 @@ select:focus {
 }
 .rec-saving {
   font-weight: 700;
-  color: var(--green-700);
+  color: var(--positive);
   white-space: nowrap;
 }
 .rec-detail {
@@ -438,16 +491,21 @@ select:focus {
   padding: 0.12rem 0.55rem;
   border-radius: 999px;
   background: var(--green-100);
-  color: var(--green-900);
+  color: var(--accent-text);
 }
-.tag[data-effort='low']::before {
-  content: 'Easy win · ';
+/* Effort cue — the label text lives in the DOM (see ui/render.js) so it is read
+   by assistive tech; colour is a redundant visual aid, never the sole signal. */
+.tag[data-effort='low'] {
+  background: #dcfce7;
+  color: #14532d;
 }
-.tag[data-effort='medium']::before {
-  content: 'Moderate · ';
+.tag[data-effort='medium'] {
+  background: #fef9c3;
+  color: #713f12;
 }
-.tag[data-effort='high']::before {
-  content: 'Bigger change · ';
+.tag[data-effort='high'] {
+  background: #ffedd5;
+  color: #7c2d12;
 }
 
 .plan-projection {
@@ -486,7 +544,7 @@ select:focus {
   font-weight: 600;
 }
 .h-delta.down {
-  color: var(--green-700);
+  color: var(--positive);
 }
 .h-delta.up {
   color: var(--red);
@@ -519,7 +577,7 @@ select:focus {
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--green-50);
-  color: var(--green-900);
+  color: var(--accent-text);
 }
 .chip:hover {
   background: var(--green-100);
@@ -532,7 +590,7 @@ select:focus {
   align-items: flex-start;
   margin: 1rem 0 0.25rem;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+  background: var(--note-grad);
   border: 1px solid var(--green-100);
   border-radius: 12px;
 }
@@ -603,7 +661,7 @@ select:focus {
 .gauge-track {
   position: relative;
   height: 26px;
-  background: #eef2ef;
+  background: var(--track);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -629,7 +687,7 @@ select:focus {
   position: absolute;
   inset-block: -3px;
   width: 3px;
-  background: #0f172a;
+  background: var(--marker);
   transform: translateX(-1px);
 }
 .gauge-target::after {
@@ -649,7 +707,7 @@ select:focus {
   color: var(--muted);
 }
 .gauge-legend .proj {
-  color: var(--green-700);
+  color: var(--positive);
 }
 .goal-message {
   margin: 0.7rem 0 0.2rem;
@@ -691,7 +749,7 @@ select:focus {
 }
 .trend-svg {
   display: block;
-  background: #f3f7f4;
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
 }

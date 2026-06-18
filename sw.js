@@ -8,7 +8,7 @@
  * Bump CACHE_VERSION whenever shell assets change to retire the old cache.
  */
 
-const CACHE_VERSION = 'ecotrack-v2';
+const CACHE_VERSION = 'ecotrack-1a83b6ef4342';
 
 const APP_SHELL = [
   './',

@@ -7,7 +7,8 @@
       name="description"
       content="EcoTrack — a smart personal carbon footprint assistant. Estimate your emissions, set a goal, and get a personalized, interactive plan to reach it."
     />
-    <meta name="theme-color" content="#15803d" />
+    <meta name="theme-color" content="#166534" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1310" media="(prefers-color-scheme: dark)" />
     <title>EcoTrack — Personal Carbon Footprint Assistant</title>
     <link rel="stylesheet" href="./src/styles.css" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -31,7 +32,7 @@
 
     <main class="wrap layout" id="main">
       <!-- ============================ INPUT ============================ -->
-      <section id="assessment" aria-labelledby="assessment-title" class="card">
+      <section id="assessment" aria-labelledby="assessment-title" class="card" tabindex="-1">
         <h1 id="assessment-title">Your footprint assessment</h1>
         <p class="muted">
           Enter what you know — leave anything blank as zero. Or start from an example and tweak it.
@@ -47,7 +48,7 @@
         <form id="footprint-form" novalidate>
           <div class="field">
             <label for="period">I'm entering my usage per</label>
-            <select id="period" name="period">
+            <select id="period" name="period" aria-describedby="period-hint">
               <option value="day">day</option>
               <option value="week">week</option>
               <option value="month" selected>month</option>
@@ -137,8 +138,9 @@
                   step="1"
                   inputmode="numeric"
                   value="0"
+                  aria-describedby="flightsShort-hint"
                 />
-                <p class="hint">Return trips under ~1,500 km.</p>
+                <p class="hint" id="flightsShort-hint">Return trips under ~1,500 km.</p>
               </div>
               <div class="field">
                 <label for="flightsLongPerYear">Long-haul flights / year</label>
@@ -150,8 +152,9 @@
                   step="1"
                   inputmode="numeric"
                   value="0"
+                  aria-describedby="flightsLong-hint"
                 />
-                <p class="hint">Return intercontinental trips.</p>
+                <p class="hint" id="flightsLong-hint">Return intercontinental trips.</p>
               </div>
             </div>
           </fieldset>
@@ -209,10 +212,13 @@
                   step="1"
                   inputmode="numeric"
                   value="1"
+                  aria-describedby="household-hint"
                 />
               </div>
             </div>
-            <p class="hint">Home energy is shared and split across everyone in the household.</p>
+            <p class="hint" id="household-hint">
+              Home energy is shared and split across everyone in the household.
+            </p>
           </fieldset>
 
           <fieldset>
