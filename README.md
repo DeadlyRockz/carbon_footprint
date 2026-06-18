@@ -8,14 +8,14 @@ you travel, power your home, eat, and shop into an estimated yearly carbon
 footprint — then reasons about **your** situation to build an interactive plan
 that helps you hit a climate goal.
 
-**Challenge vertical:** Challenge 3 — *Carbon Footprint*.
+**Challenge vertical:** Challenge 3 — _Carbon Footprint_.
 
 > 🧭 New here? Click a **Quick-start** chip (🚗 / ✈️ / 🌿) to see the whole
 > experience in one click, then tweak the numbers to match your life.
 
 ---
 
-## ✨ What makes it a true *assistant* (not just a calculator)
+## ✨ What makes it a true _assistant_ (not just a calculator)
 
 1. **Estimates** your annual CO₂e across five categories — transport, home
    energy, food, shopping, and waste.
@@ -49,8 +49,12 @@ you change your goal.
 # Option 2 — serve it (Node 18+)
 npm start          # → http://localhost:4173
 
-# Run the test suite (55 unit + integration tests, Node's built-in runner)
+# Run the test suite (64 unit + integration tests, Node's built-in runner)
 npm test
+
+# Code-quality tooling (dev-only; the app itself ships zero dependencies)
+npm run lint           # ESLint — correctness
+npm run format:check   # Prettier — formatting
 ```
 
 > The browser loads `app.bundle.js`, a classic script generated from the ES
@@ -77,15 +81,18 @@ src/
     insights.js             Natural-language coaching, rule-based (pure)
     storage.js              Defensive localStorage wrapper (privacy-first)
     format.js               Shared number/text formatting (pure)
+    math.js                 Shared rounding helper (single source of truth)
   presets.js                Quick-start example lifestyles
   chart.js                  Tiny accessible SVG trend chart (pure geometry)
   app.js                    Wires the form to the engines, renders safely
   styles.css                Accessible, responsive styling
 index.html                  Semantic, labelled, keyboard-friendly UI
 manifest.webmanifest, sw.js, icon.svg   PWA: installable + offline
-tests/                      55 unit + integration tests
+tests/                      64 unit + integration tests
 scripts/serve.js            Minimal static server with path-traversal guard
-.github/workflows/ci.yml    CI: syntax-check + test on Node 18/20/22
+scripts/build.js            Zero-dependency ES-module -> classic-script bundler
+eslint.config.js, .prettierrc.json      Lint + format config (dev-only)
+.github/workflows/ci.yml    CI: lint, format, syntax-check + test on Node 18/20/22
 ```
 
 ### How the recommendation engine decides (the smart part)
@@ -93,7 +100,7 @@ scripts/serve.js            Minimal static server with path-traversal guard
 [`src/core/recommendations.js`](src/core/recommendations.js) holds a library of
 candidate actions. Each action is self-describing:
 
-- **`applies(context)`** — is this relevant to *this* user? (e.g. "only if the
+- **`applies(context)`** — is this relevant to _this_ user? (e.g. "only if the
   car isn't already electric and its emissions are significant")
 - **`saving(context)`** — kg CO₂e/year saved, computed from the user's own
   activity, not a generic number.
@@ -106,7 +113,7 @@ returns a ranked plan. Adding a behaviour is just appending one object.
 
 [`src/core/planner.js`](src/core/planner.js) is what makes it feel alive:
 
-- **`projectFootprint(...)`** computes the footprint for *any subset* of chosen
+- **`projectFootprint(...)`** computes the footprint for _any subset_ of chosen
   actions, capping savings per category so projections stay physically real.
 - **`autoSelectForTarget(...)`** greedily picks the fewest high-impact actions
   that reach a goal, re-checking the true projection after each pick.
@@ -150,18 +157,21 @@ Poore & Nemecek (2018) on food, and Our World in Data per-capita figures.
 ## ✅ Evaluation focus
 
 - **Code quality** — small, pure, single-responsibility modules; one source of
-  truth for data and for projection logic (shared by the engine and the UI);
-  declarative, comment-documented rendering.
+  truth for data, rounding, fuel factors, and projection logic (shared by the
+  engine and the UI); named tuning constants instead of magic numbers; JSDoc
+  typedefs; declarative, comment-documented rendering; enforced by ESLint +
+  Prettier in CI.
 - **Security** — no backend, no network calls, no `eval`/`innerHTML`; all
   dynamic content set via `textContent`; user input sanitized at the boundary;
   the dev server and service worker both reject cross-origin/traversal requests;
   data never leaves the device.
 - **Efficiency** — zero dependencies, no build, instant load, offline-capable;
   bounded on-device history; pure functions trivial to memoize or offload.
-- **Testing** — 55 unit + integration tests covering calculation, benchmarks,
+- **Testing** — 64 unit + integration tests covering calculation, benchmarks,
   the context-driven recommendation logic, the planner/what-if invariants,
-  chart geometry, presets, NL coaching, and the full UI data pipeline. CI runs
-  them on Node 18/20/22.
+  chart geometry, presets, NL coaching, shared helpers, the storage layer (both
+  the persist/trim happy path and graceful degradation), and the full UI data
+  pipeline. CI runs them on Node 18/20/22.
 - **Accessibility** — semantic landmarks, a skip link, labelled `fieldset`/
   `legend` groups, real `<label>`s on every control, visible focus styles,
   `aria-live` result/gauge announcements, text-not-just-color charts, and

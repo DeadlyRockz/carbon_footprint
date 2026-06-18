@@ -19,8 +19,14 @@ import {
   WASTE_ANNUAL,
   RECYCLING_AVOIDED_SHARE,
 } from '../data/emissionFactors.js';
-import { annualize, toNonNegativeNumber, CATEGORY_LABELS } from './calculator.js';
+import {
+  annualize,
+  toNonNegativeNumber,
+  carEmissionFactor,
+  CATEGORY_LABELS,
+} from './calculator.js';
 import { projectFootprint } from './planner.js';
+import { roundTo as round } from './math.js';
 
 /** Effort levels lightly bias ranking toward easy wins. */
 const EFFORT_WEIGHT = Object.freeze({ low: 1, medium: 0.85, high: 0.7 });
@@ -29,20 +35,45 @@ const EFFORT_WEIGHT = Object.freeze({ low: 1, medium: 0.85, high: 0.7 });
 const MIN_SAVING_KG = 40;
 
 /**
+ * Tuning for the action library, named and grouped so every estimate is
+ * transparent and adjustable in one place rather than scattered as bare
+ * literals inside the action definitions below.
+ */
+
+/** Minimum yearly kg an action's target activity must reach to be relevant. */
+const RELEVANT_ABOVE_KG = Object.freeze({
+  carActiveTravel: 150,
+  carShare: 500,
+  carModeShift: 400,
+  carSwitchEv: 900,
+  shortFlight: 150,
+  longFlight: 700,
+  electricityGreenTariff: 200,
+  electricityEfficiency: 300,
+  heatingGas: 250,
+  dietFoodWaste: 1000,
+});
+
+/** Fraction of an activity's emissions a behaviour is estimated to remove. */
+const SAVING_SHARE = Object.freeze({
+  activeTravel: 0.15, // walk/cycle the shortest car trips
+  carShare: 0.5, // carpool halves emissions attributed to you
+  modeShift: 0.3, // shift ~a third of driving to transit
+  longFlight: 0.5, // take one fewer of frequent long-haul trips
+  efficientElectricity: 0.12, // LEDs + A-rated appliances
+  heatingEfficiency: 0.13, // insulation + 1 °C lower thermostat
+  foodWaste: 0.08, // planning meals / using leftovers
+  mindfulShopping: 0.4, // share of the average→low gap that's realistic
+});
+
+/**
  * Assemble everything an action needs to reason about the user. Pre-computing
  * annualized activity here keeps each action definition small and readable.
  */
 function buildContext(profile, footprint) {
   const period = footprint.period;
   const t = profile.transport ?? {};
-  const carFactor =
-    {
-      petrol: TRANSPORT_FACTORS.carPetrol,
-      diesel: TRANSPORT_FACTORS.carDiesel,
-      hybrid: TRANSPORT_FACTORS.carHybrid,
-      electric: TRANSPORT_FACTORS.carElectric,
-    }[t.carFuel] ?? TRANSPORT_FACTORS.carPetrol;
-
+  const carFactor = carEmissionFactor(t.carFuel);
   const occupancy = Math.max(1, toNonNegativeNumber(t.carOccupancy, 1));
 
   return {
@@ -73,8 +104,8 @@ const ACTIONS = [
     category: 'transport',
     title: 'Walk or cycle short trips',
     effort: 'low',
-    applies: (c) => c.parts.transport.car > 150,
-    saving: (c) => c.parts.transport.car * 0.15,
+    applies: (c) => c.parts.transport.car > RELEVANT_ABOVE_KG.carActiveTravel,
+    saving: (c) => c.parts.transport.car * SAVING_SHARE.activeTravel,
     detail: () =>
       'Swapping the shortest car journeys for walking or cycling typically removes about 15% of car emissions — and it’s free.',
   },
@@ -83,8 +114,8 @@ const ACTIONS = [
     category: 'transport',
     title: 'Share rides / increase car occupancy',
     effort: 'low',
-    applies: (c) => c.occupancy <= 1 && c.parts.transport.car > 500,
-    saving: (c) => c.parts.transport.car * 0.5,
+    applies: (c) => c.occupancy <= 1 && c.parts.transport.car > RELEVANT_ABOVE_KG.carShare,
+    saving: (c) => c.parts.transport.car * SAVING_SHARE.carShare,
     detail: () =>
       'Carpooling with one other person halves the emissions attributed to each of you for the same journeys.',
   },
@@ -93,9 +124,11 @@ const ACTIONS = [
     category: 'transport',
     title: 'Move some commutes to public transport',
     effort: 'medium',
-    applies: (c) => c.profile.transport.carFuel !== 'electric' && c.parts.transport.car > 400,
+    applies: (c) =>
+      c.profile.transport.carFuel !== 'electric' &&
+      c.parts.transport.car > RELEVANT_ABOVE_KG.carModeShift,
     saving: (c) =>
-      0.3 * c.annual.carKm * (c.carFactorEffective - TRANSPORT_FACTORS.bus),
+      SAVING_SHARE.modeShift * c.annual.carKm * (c.carFactorEffective - TRANSPORT_FACTORS.bus),
     detail: () =>
       'Shifting roughly a third of your driving to bus or train keeps you mobile while cutting a large slice of transport emissions.',
   },
@@ -106,9 +139,8 @@ const ACTIONS = [
     effort: 'high',
     applies: (c) =>
       ['petrol', 'diesel'].includes(c.profile.transport.carFuel) &&
-      c.parts.transport.car > 900,
-    saving: (c) =>
-      c.annual.carKm * (c.carFactorEffective - TRANSPORT_FACTORS.carElectric),
+      c.parts.transport.car > RELEVANT_ABOVE_KG.carSwitchEv,
+    saving: (c) => c.annual.carKm * (c.carFactorEffective - TRANSPORT_FACTORS.carElectric),
     detail: () =>
       'You drive enough that an EV (charged on a typical grid) would dramatically cut your per-kilometre emissions over its lifetime.',
   },
@@ -117,10 +149,9 @@ const ACTIONS = [
     category: 'transport',
     title: 'Take the train instead of short-haul flights',
     effort: 'medium',
-    applies: (c) => c.parts.transport.flightShort > 150,
+    applies: (c) => c.parts.transport.flightShort > RELEVANT_ABOVE_KG.shortFlight,
     saving: (c) =>
-      c.annual.flightShortKm *
-      (TRANSPORT_FACTORS.flightShortHaul - TRANSPORT_FACTORS.train),
+      c.annual.flightShortKm * (TRANSPORT_FACTORS.flightShortHaul - TRANSPORT_FACTORS.train),
     detail: () =>
       'For trips under ~1,500 km, rail can cut the journey’s emissions by around 80% versus flying.',
   },
@@ -129,8 +160,8 @@ const ACTIONS = [
     category: 'transport',
     title: 'Take one fewer long-haul flight',
     effort: 'medium',
-    applies: (c) => c.parts.transport.flightLong > 700,
-    saving: (c) => c.parts.transport.flightLong * 0.5,
+    applies: (c) => c.parts.transport.flightLong > RELEVANT_ABOVE_KG.longFlight,
+    saving: (c) => c.parts.transport.flightLong * SAVING_SHARE.longFlight,
     detail: () =>
       'Long-haul flights are among the most carbon-intensive things an individual can do. Replacing or combining trips makes a big dent.',
   },
@@ -142,7 +173,8 @@ const ACTIONS = [
     title: 'Switch to a renewable electricity tariff',
     effort: 'low',
     applies: (c) =>
-      c.profile.home.gridRegion !== 'renewable' && c.parts.home.electricity > 200,
+      c.profile.home.gridRegion !== 'renewable' &&
+      c.parts.home.electricity > RELEVANT_ABOVE_KG.electricityGreenTariff,
     saving: (c) => {
       const current = GRID_INTENSITY[c.profile.home.gridRegion] ?? GRID_INTENSITY.world;
       return c.parts.home.electricity * (1 - GRID_INTENSITY.renewable / current);
@@ -155,8 +187,8 @@ const ACTIONS = [
     category: 'home',
     title: 'Upgrade to LED lighting & efficient appliances',
     effort: 'medium',
-    applies: (c) => c.parts.home.electricity > 300,
-    saving: (c) => c.parts.home.electricity * 0.12,
+    applies: (c) => c.parts.home.electricity > RELEVANT_ABOVE_KG.electricityEfficiency,
+    saving: (c) => c.parts.home.electricity * SAVING_SHARE.efficientElectricity,
     detail: () =>
       'LED bulbs and high-efficiency (A-rated) appliances typically trim home electricity use by 10–15%.',
   },
@@ -165,8 +197,8 @@ const ACTIONS = [
     category: 'home',
     title: 'Improve heating: insulation + 1 °C lower',
     effort: 'medium',
-    applies: (c) => c.parts.home.gas > 250,
-    saving: (c) => c.parts.home.gas * 0.13,
+    applies: (c) => c.parts.home.gas > RELEVANT_ABOVE_KG.heatingGas,
+    saving: (c) => c.parts.home.gas * SAVING_SHARE.heatingEfficiency,
     detail: () =>
       'Better insulation and turning the thermostat down a single degree noticeably reduces gas use over a heating season.',
   },
@@ -198,8 +230,8 @@ const ACTIONS = [
     category: 'diet',
     title: 'Cut household food waste',
     effort: 'low',
-    applies: (c) => c.footprint.categories.diet > 1000,
-    saving: (c) => c.footprint.categories.diet * 0.08,
+    applies: (c) => c.footprint.categories.diet > RELEVANT_ABOVE_KG.dietFoodWaste,
+    saving: (c) => c.footprint.categories.diet * SAVING_SHARE.foodWaste,
     detail: () =>
       'Planning meals and using leftovers avoids the emissions baked into food that’s bought but never eaten (~8% for many households).',
   },
@@ -221,7 +253,7 @@ const ACTIONS = [
     title: 'Repair and reuse before replacing',
     effort: 'low',
     applies: (c) => c.profile.shopping.level === 'average',
-    saving: () => (SHOPPING_ANNUAL.average - SHOPPING_ANNUAL.low) * 0.4,
+    saving: () => (SHOPPING_ANNUAL.average - SHOPPING_ANNUAL.low) * SAVING_SHARE.mindfulShopping,
     detail: () =>
       'Small habits — repairing, borrowing, and choosing durable goods — steadily lower the footprint of everything you own.',
   },
@@ -301,9 +333,7 @@ export function recommend(profile, footprint, { limit = 6 } = {}) {
     recommendations,
     totalPotentialSaving: totalSaving,
     projectedTotal,
-    projectedReductionPct: footprint.total
-      ? Math.round((totalSaving / footprint.total) * 100)
-      : 0,
+    projectedReductionPct: footprint.total ? Math.round((totalSaving / footprint.total) * 100) : 0,
   };
 }
 
@@ -322,8 +352,4 @@ function safeSaving(action, context) {
   } catch {
     return 0;
   }
-}
-
-function round(n) {
-  return Math.round(n * 10) / 10;
 }

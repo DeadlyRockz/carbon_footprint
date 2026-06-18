@@ -6,6 +6,8 @@
  * plus a descriptive label) and is only called in the browser.
  */
 
+import { roundTo } from './core/math.js';
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /**
@@ -26,7 +28,7 @@ export function chartGeometry(values, { width = 320, height = 120, pad = 10 } = 
   const points = nums.map((v, i) => {
     const x = nums.length === 1 ? width / 2 : pad + (i / (nums.length - 1)) * innerW;
     const y = pad + (1 - (v - min) / span) * innerH;
-    return { x: round(x), y: round(y), v };
+    return { x: roundTo(x, 2), y: roundTo(y, 2), v };
   });
 
   return { points, min, max };
@@ -96,8 +98,4 @@ function describeSeries(values) {
   const latest = nums.at(-1).toFixed(1);
   const first = nums[0].toFixed(1);
   return `Footprint trend over ${nums.length} snapshots, from ${first} to ${latest} tonnes CO2e per year.`;
-}
-
-function round(n) {
-  return Math.round(n * 100) / 100;
 }

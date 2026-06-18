@@ -1,7 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { formatKg, formatTonnes, formatPercent, treesEquivalent } from '../src/core/format.js';
+import {
+  formatKg,
+  formatTonnes,
+  formatPercent,
+  treesEquivalent,
+  isoDate,
+} from '../src/core/format.js';
 import {
   isStorageAvailable,
   saveProfile,
@@ -21,6 +27,11 @@ test('format helpers tolerate junk input', () => {
   assert.equal(formatKg('nope'), '0 kg');
   assert.equal(formatTonnes(undefined), '0.0 t');
   assert.equal(formatPercent(null), '0%');
+});
+
+test('isoDate formats a date as YYYY-MM-DD', () => {
+  assert.equal(isoDate(new Date('2026-06-18T12:34:56Z')), '2026-06-18');
+  assert.match(isoDate(), /^\d{4}-\d{2}-\d{2}$/, 'defaults to today in ISO form');
 });
 
 test('storage degrades gracefully without a browser', () => {

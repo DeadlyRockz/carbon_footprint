@@ -36,7 +36,8 @@ function el(tag, props = {}, children = []) {
     if (key === 'class') node.className = value;
     else if (key === 'text') node.textContent = value;
     else if (key === 'html') throw new Error('innerHTML is intentionally not supported');
-    else if (key.startsWith('data-') || key === 'role' || key === 'for') node.setAttribute(key, value);
+    else if (key.startsWith('data-') || key === 'role' || key === 'for')
+      node.setAttribute(key, value);
     else if (key === 'aria') {
       for (const [a, v] of Object.entries(value)) node.setAttribute(`aria-${a}`, v);
     } else node[key] = value;
@@ -46,6 +47,19 @@ function el(tag, props = {}, children = []) {
 }
 
 const $ = (id) => document.getElementById(id);
+
+/** True when the user has asked the OS to minimize animation/motion. */
+function prefersReducedMotion() {
+  return Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+}
+
+/** Scroll an element into view, honouring the user's reduced-motion preference. */
+function scrollIntoViewSafe(node) {
+  node?.scrollIntoView({
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    block: 'start',
+  });
+}
 
 /** Single source of truth for the current result + interactive plan. */
 const state = {
@@ -149,6 +163,12 @@ function computeAndRender(profile) {
 
   const results = $('results');
   results.hidden = false;
+
+  // Announce the headline result to assistive tech as soon as it's ready.
+  $('sr-status').textContent = `Your estimated footprint is ${formatTonnes(
+    footprint.total,
+  )} CO₂e per year — rating: ${summary.rating.label}. ${headline(summary)}`;
+
   results.focus?.();
 }
 
@@ -288,7 +308,10 @@ function renderGauge() {
       ],
     ),
     el('div', { class: 'gauge-legend' }, [
-      el('span', {}, [el('b', { text: 'Now ' }), document.createTextNode(formatTonnes(footprint.total))]),
+      el('span', {}, [
+        el('b', { text: 'Now ' }),
+        document.createTextNode(formatTonnes(footprint.total)),
+      ]),
       el('span', { class: 'proj' }, [
         el('b', { text: 'Projected ' }),
         document.createTextNode(formatTonnes(projected)),
@@ -456,7 +479,7 @@ function init() {
       applyProfile(form, preset);
       saveProfile(preset);
       computeAndRender(preset);
-      $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      scrollIntoViewSafe($('results'));
     });
   }
 
@@ -478,7 +501,7 @@ function init() {
       categories: state.footprint.categories,
     });
     renderHistory(history);
-    $('tracker').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollIntoViewSafe($('tracker'));
   });
 
   $('clear-history').addEventListener('click', () => renderHistory(clearHistory()));

@@ -43,3 +43,11 @@ test('headline is a non-empty human-readable string', () => {
   assert.ok(text.length > 20);
   assert.ok(text.includes('8.2 t'));
 });
+
+test('headline congratulates an excellent footprint', () => {
+  assert.match(headline(benchmark(1500)), /sustainable range/i);
+});
+
+test('headline notes being on track once at the 2030 target', () => {
+  assert.match(headline(benchmark(2200)), /2030 climate target/i);
+});

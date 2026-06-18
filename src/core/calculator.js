@@ -17,6 +17,23 @@ import {
   RECYCLING_AVOIDED_SHARE,
   PERIOD_TO_YEAR,
 } from '../data/emissionFactors.js';
+import { roundTo } from './math.js';
+
+/**
+ * @typedef {object} Profile A complete activity profile (see createDefaultProfile).
+ * @property {string} period one of 'day' | 'week' | 'month' | 'year'
+ * @property {object} transport car / bus / train / flight activity
+ * @property {object} home electricity, gas, grid region and household size
+ * @property {{ type: string }} diet dietary archetype
+ * @property {{ level: string }} shopping consumption level
+ * @property {{ level: string, recycles: boolean }} waste waste level + recycling
+ *
+ * @typedef {object} Footprint The annualized result of calculateFootprint().
+ * @property {number} total kg CO2e per year across all categories
+ * @property {Record<string, number>} categories per-category kg CO2e per year
+ * @property {Record<string, { total: number, parts: Record<string, number> }>} details
+ * @property {string} period the period the inputs were interpreted in
+ */
 
 /** Human-readable labels for each footprint category. */
 export const CATEGORY_LABELS = Object.freeze({
@@ -76,19 +93,31 @@ function pickFactor(map, key, fallbackKey) {
   return map[key] ?? map[fallbackKey];
 }
 
-/** Annual transport emissions (kg CO2e) from the transport sub-profile. */
-function calcTransport(transport, period) {
-  const occupancy = Math.max(1, toNonNegativeNumber(transport.carOccupancy, 1));
-  const carFactor = pickFactor(
+/**
+ * Resolve a car fuel type to its emission factor (kg CO2e per passenger-km).
+ * Shared by the calculator and the recommendation engine so both reason about
+ * fuel from a single source of truth.
+ *
+ * @param {string} fuel 'petrol' | 'diesel' | 'hybrid' | 'electric'
+ * @returns {number}
+ */
+export function carEmissionFactor(fuel) {
+  return pickFactor(
     {
       petrol: TRANSPORT_FACTORS.carPetrol,
       diesel: TRANSPORT_FACTORS.carDiesel,
       hybrid: TRANSPORT_FACTORS.carHybrid,
       electric: TRANSPORT_FACTORS.carElectric,
     },
-    transport.carFuel,
+    fuel,
     'petrol',
   );
+}
+
+/** Annual transport emissions (kg CO2e) from the transport sub-profile. */
+function calcTransport(transport, period) {
+  const occupancy = Math.max(1, toNonNegativeNumber(transport.carOccupancy, 1));
+  const carFactor = carEmissionFactor(transport.carFuel);
 
   const car = (annualize(transport.carKm, period) * carFactor) / occupancy;
   const bus = annualize(transport.busKm, period) * TRANSPORT_FACTORS.bus;
@@ -151,12 +180,9 @@ function calcWaste(waste) {
 /**
  * Calculate a full annual footprint from a profile.
  *
- * @returns {{
- *   total: number,
- *   categories: Record<string, number>,
- *   details: Record<string, { total: number, parts: Record<string, number> }>,
- *   period: string
- * }} all emissions in kg CO2e per year.
+ * @param {Partial<Profile>} profile the user's activity profile (partial is fine;
+ *   missing fields fall back to createDefaultProfile()).
+ * @returns {Footprint} all emissions in kg CO2e per year.
  */
 export function calculateFootprint(profile) {
   const safe = { ...createDefaultProfile(), ...profile };
@@ -169,16 +195,14 @@ export function calculateFootprint(profile) {
   const waste = calcWaste(safe.waste ?? {});
 
   const categories = {
-    transport: round(transport.total),
-    home: round(home.total),
-    diet: round(diet.total),
-    shopping: round(shopping.total),
-    waste: round(waste.total),
+    transport: roundTo(transport.total),
+    home: roundTo(home.total),
+    diet: roundTo(diet.total),
+    shopping: roundTo(shopping.total),
+    waste: roundTo(waste.total),
   };
 
-  const total = round(
-    transport.total + home.total + diet.total + shopping.total + waste.total,
-  );
+  const total = roundTo(transport.total + home.total + diet.total + shopping.total + waste.total);
 
   return {
     total,
@@ -203,8 +227,4 @@ export function rankCategories(footprint) {
       share: value / total,
     }))
     .sort((a, b) => b.value - a.value);
-}
-
-function round(n) {
-  return Math.round(n * 10) / 10;
 }

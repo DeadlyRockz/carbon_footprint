@@ -43,8 +43,11 @@ test('selecting more actions never increases the projected total', () => {
   const ids = plan.recommendations.map((r) => r.id);
   let prev = footprint.total;
   for (let i = 1; i <= ids.length; i += 1) {
-    const projected = projectFootprint(footprint, plan.recommendations, ids.slice(0, i))
-      .projectedTotal;
+    const projected = projectFootprint(
+      footprint,
+      plan.recommendations,
+      ids.slice(0, i),
+    ).projectedTotal;
     assert.ok(projected <= prev, 'monotonically non-increasing');
     assert.ok(projected >= 0, 'never negative');
     prev = projected;
@@ -83,7 +86,12 @@ test('autoSelectForTarget is greedy: picks highest-impact first', () => {
 });
 
 test('goalStatus reports reached / gap correctly', () => {
-  assert.deepEqual(goalStatus(2000, 2300), { reached: true, gap: 0, overshoot: 300, targetKg: 2300 });
+  assert.deepEqual(goalStatus(2000, 2300), {
+    reached: true,
+    gap: 0,
+    overshoot: 300,
+    targetKg: 2300,
+  });
   const miss = goalStatus(3000, 2300);
   assert.equal(miss.reached, false);
   assert.equal(miss.gap, 700);

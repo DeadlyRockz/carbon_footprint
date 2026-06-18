@@ -35,7 +35,10 @@ for (const [name, profile] of Object.entries(PRESETS)) {
     const target = presets.find((p) => p.id === 'paris2030').targetKg;
     const selected = autoSelectForTarget(footprint, plan.recommendations, target);
     const ids = new Set(plan.recommendations.map((r) => r.id));
-    assert.ok(selected.every((id) => ids.has(id)), 'selection ⊆ recommendations');
+    assert.ok(
+      selected.every((id) => ids.has(id)),
+      'selection ⊆ recommendations',
+    );
 
     // Projection invariants hold for the selected plan.
     const projection = projectFootprint(footprint, plan.recommendations, selected);
@@ -63,8 +66,5 @@ test('switching goals re-plans toward a stricter target', () => {
   const looseSel = autoSelectForTarget(footprint, plan.recommendations, footprint.total * 0.9);
   const strictSel = autoSelectForTarget(footprint, plan.recommendations, footprint.total * 0.5);
 
-  assert.ok(
-    strictSel.length >= looseSel.length,
-    'a tougher goal selects at least as many actions',
-  );
+  assert.ok(strictSel.length >= looseSel.length, 'a tougher goal selects at least as many actions');
 });

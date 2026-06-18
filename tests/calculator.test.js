@@ -7,6 +7,7 @@ import {
   toNonNegativeNumber,
   annualize,
   rankCategories,
+  carEmissionFactor,
 } from '../src/core/calculator.js';
 
 test('toNonNegativeNumber sanitizes untrusted input', () => {
@@ -107,4 +108,13 @@ test('malformed profiles never throw and never produce NaN', () => {
   const result = calculateFootprint({ transport: { carKm: 'oops' }, home: null });
   assert.ok(Number.isFinite(result.total));
   assert.ok(result.total >= 0);
+});
+
+test('carEmissionFactor maps each fuel and falls back to petrol', () => {
+  assert.equal(carEmissionFactor('petrol'), 0.192);
+  assert.equal(carEmissionFactor('diesel'), 0.171);
+  assert.equal(carEmissionFactor('hybrid'), 0.12);
+  assert.equal(carEmissionFactor('electric'), 0.05);
+  assert.equal(carEmissionFactor('unknown'), carEmissionFactor('petrol'), 'unknown -> petrol');
+  assert.equal(carEmissionFactor(undefined), 0.192, 'missing -> petrol');
 });

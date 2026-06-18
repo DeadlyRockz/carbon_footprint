@@ -12,6 +12,8 @@
  * user toggles. All functions are pure for easy testing.
  */
 
+import { roundTo as round } from './math.js';
+
 /**
  * Project the footprint that results from applying a chosen set of actions.
  *
@@ -108,8 +110,4 @@ export function goalPresets(footprintTotal, benchmarks) {
       targetKg: benchmarks.sustainable,
     },
   ];
-}
-
-function round(n) {
-  return Math.round(n * 10) / 10;
 }

@@ -29,7 +29,13 @@ html {
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
     sans-serif;
   color: var(--ink);
   background: var(--bg);
@@ -46,6 +52,19 @@ body {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Visually hidden but available to assistive tech (e.g. live announcements). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .skip-link {
@@ -180,7 +199,7 @@ legend {
     grid-template-columns: 1fr 1fr;
   }
 }
-input[type="number"],
+input[type='number'],
 select {
   width: 100%;
   font: inherit;
@@ -190,7 +209,7 @@ select {
   background: #fff;
   color: var(--ink);
 }
-input[type="number"]:focus,
+input[type='number']:focus,
 select:focus {
   border-color: var(--green-600);
 }
@@ -228,7 +247,9 @@ select:focus {
   border-radius: 10px;
   padding: 0.7rem 1.2rem;
   border: 1px solid transparent;
-  transition: background-color 0.15s ease, transform 0.05s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.05s ease;
 }
 .btn:active {
   transform: translateY(1px);
@@ -283,23 +304,23 @@ select:focus {
   background: #e5e7eb;
   color: #111;
 }
-.badge[data-rating="excellent"] {
+.badge[data-rating='excellent'] {
   background: #bbf7d0;
   color: #064e3b;
 }
-.badge[data-rating="good"] {
+.badge[data-rating='good'] {
   background: #d9f99d;
   color: #3f6212;
 }
-.badge[data-rating="fair"] {
+.badge[data-rating='fair'] {
   background: #fef08a;
   color: #713f12;
 }
-.badge[data-rating="high"] {
+.badge[data-rating='high'] {
   background: #fed7aa;
   color: #7c2d12;
 }
-.badge[data-rating="veryHigh"] {
+.badge[data-rating='veryHigh'] {
   background: #fecaca;
   color: #7f1d1d;
 }
@@ -419,9 +440,15 @@ select:focus {
   background: var(--green-100);
   color: var(--green-900);
 }
-.tag[data-effort="low"]::before { content: "Easy win · "; }
-.tag[data-effort="medium"]::before { content: "Moderate · "; }
-.tag[data-effort="high"]::before { content: "Bigger change · "; }
+.tag[data-effort='low']::before {
+  content: 'Easy win · ';
+}
+.tag[data-effort='medium']::before {
+  content: 'Moderate · ';
+}
+.tag[data-effort='high']::before {
+  content: 'Bigger change · ';
+}
 
 .plan-projection {
   margin-top: 1rem;
@@ -458,8 +485,12 @@ select:focus {
 .history .h-delta {
   font-weight: 600;
 }
-.h-delta.down { color: var(--green-700); }
-.h-delta.up { color: var(--red); }
+.h-delta.down {
+  color: var(--green-700);
+}
+.h-delta.up {
+  color: var(--red);
+}
 
 .empty {
   color: var(--muted);
@@ -580,13 +611,7 @@ select:focus {
   position: absolute;
   inset-block: 0;
   left: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    #fed7aa,
-    #fed7aa 7px,
-    #fdba74 7px,
-    #fdba74 14px
-  );
+  background: repeating-linear-gradient(45deg, #fed7aa, #fed7aa 7px, #fdba74 7px, #fdba74 14px);
   opacity: 0.7;
 }
 .gauge-projected {
@@ -608,7 +633,7 @@ select:focus {
   transform: translateX(-1px);
 }
 .gauge-target::after {
-  content: "🎯";
+  content: '🎯';
   position: absolute;
   top: -1.25rem;
   left: 50%;

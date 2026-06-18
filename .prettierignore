@@ -1,0 +1,9 @@
+# Generated artifact — built from src/ by `npm run build`, never edited by hand.
+app.bundle.js
+
+# Dependencies and lockfile
+node_modules/
+package-lock.json
+
+# Provided challenge brief — kept verbatim, not ours to reformat.
+claude.md

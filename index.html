@@ -21,13 +21,11 @@
         <div>
           <p class="brand"><span aria-hidden="true">🌱</span> EcoTrack</p>
           <p class="tagline">
-            Understand, track, and reduce your carbon footprint — with a plan
-            built around your life.
+            Understand, track, and reduce your carbon footprint — with a plan built around your
+            life.
           </p>
         </div>
-        <button id="install" class="btn btn-install" type="button" hidden>
-          ⬇️ Install app
-        </button>
+        <button id="install" class="btn btn-install" type="button" hidden>⬇️ Install app</button>
       </div>
     </header>
 
@@ -36,8 +34,7 @@
       <section id="assessment" aria-labelledby="assessment-title" class="card">
         <h1 id="assessment-title">Your footprint assessment</h1>
         <p class="muted">
-          Enter what you know — leave anything blank as zero. Or start from an
-          example and tweak it.
+          Enter what you know — leave anything blank as zero. Or start from an example and tweak it.
         </p>
 
         <div class="presets" role="group" aria-label="Quick-start examples">
@@ -57,8 +54,8 @@
               <option value="year">year</option>
             </select>
             <p class="hint" id="period-hint">
-              Travel and energy figures use this period. Flights and lifestyle
-              choices are counted per year.
+              Travel and energy figures use this period. Flights and lifestyle choices are counted
+              per year.
             </p>
           </div>
 
@@ -67,7 +64,15 @@
 
             <div class="field">
               <label for="carKm">Distance driven by car (km)</label>
-              <input id="carKm" name="carKm" type="number" min="0" step="any" inputmode="decimal" value="0" />
+              <input
+                id="carKm"
+                name="carKm"
+                type="number"
+                min="0"
+                step="any"
+                inputmode="decimal"
+                value="0"
+              />
             </div>
 
             <div class="grid-2">
@@ -82,30 +87,70 @@
               </div>
               <div class="field">
                 <label for="carOccupancy">People usually in the car</label>
-                <input id="carOccupancy" name="carOccupancy" type="number" min="1" step="1" inputmode="numeric" value="1" />
+                <input
+                  id="carOccupancy"
+                  name="carOccupancy"
+                  type="number"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  value="1"
+                />
               </div>
             </div>
 
             <div class="grid-2">
               <div class="field">
                 <label for="busKm">Distance by bus (km)</label>
-                <input id="busKm" name="busKm" type="number" min="0" step="any" inputmode="decimal" value="0" />
+                <input
+                  id="busKm"
+                  name="busKm"
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  value="0"
+                />
               </div>
               <div class="field">
                 <label for="trainKm">Distance by train (km)</label>
-                <input id="trainKm" name="trainKm" type="number" min="0" step="any" inputmode="decimal" value="0" />
+                <input
+                  id="trainKm"
+                  name="trainKm"
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  value="0"
+                />
               </div>
             </div>
 
             <div class="grid-2">
               <div class="field">
                 <label for="flightsShortPerYear">Short-haul flights / year</label>
-                <input id="flightsShortPerYear" name="flightsShortPerYear" type="number" min="0" step="1" inputmode="numeric" value="0" />
+                <input
+                  id="flightsShortPerYear"
+                  name="flightsShortPerYear"
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  value="0"
+                />
                 <p class="hint">Return trips under ~1,500 km.</p>
               </div>
               <div class="field">
                 <label for="flightsLongPerYear">Long-haul flights / year</label>
-                <input id="flightsLongPerYear" name="flightsLongPerYear" type="number" min="0" step="1" inputmode="numeric" value="0" />
+                <input
+                  id="flightsLongPerYear"
+                  name="flightsLongPerYear"
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  value="0"
+                />
                 <p class="hint">Return intercontinental trips.</p>
               </div>
             </div>
@@ -117,7 +162,15 @@
             <div class="grid-2">
               <div class="field">
                 <label for="electricityKwh">Electricity used (kWh)</label>
-                <input id="electricityKwh" name="electricityKwh" type="number" min="0" step="any" inputmode="decimal" value="0" />
+                <input
+                  id="electricityKwh"
+                  name="electricityKwh"
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  value="0"
+                />
               </div>
               <div class="field">
                 <label for="gridRegion">Where you live (electricity grid)</label>
@@ -136,11 +189,27 @@
             <div class="grid-2">
               <div class="field">
                 <label for="naturalGasKwh">Natural gas used (kWh)</label>
-                <input id="naturalGasKwh" name="naturalGasKwh" type="number" min="0" step="any" inputmode="decimal" value="0" />
+                <input
+                  id="naturalGasKwh"
+                  name="naturalGasKwh"
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  value="0"
+                />
               </div>
               <div class="field">
                 <label for="householdSize">People in your household</label>
-                <input id="householdSize" name="householdSize" type="number" min="1" step="1" inputmode="numeric" value="1" />
+                <input
+                  id="householdSize"
+                  name="householdSize"
+                  type="number"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  value="1"
+                />
               </div>
             </div>
             <p class="hint">Home energy is shared and split across everyone in the household.</p>
@@ -195,7 +264,16 @@
       </section>
 
       <!-- =========================== RESULTS =========================== -->
-      <section id="results" class="card results" aria-labelledby="results-title" tabindex="-1" hidden>
+      <section
+        id="results"
+        class="card results"
+        aria-labelledby="results-title"
+        tabindex="-1"
+        hidden
+      >
+        <!-- Announces the headline result to screen readers the moment it's
+             calculated, independent of where focus happens to be. -->
+        <p id="sr-status" class="sr-only" role="status" aria-live="polite"></p>
         <h2 id="results-title">Your results</h2>
 
         <div class="result-total">
@@ -229,13 +307,13 @@
         <div id="gauge" class="gauge"></div>
         <p id="goal-message" class="goal-message" role="status" aria-live="polite"></p>
 
-        <p class="muted">
-          Tick the actions you’ll commit to — your projection updates instantly.
-        </p>
+        <p class="muted">Tick the actions you’ll commit to — your projection updates instantly.</p>
         <ol id="recommendations" class="recommendations" aria-label="Recommended actions"></ol>
 
         <div class="actions">
-          <button type="button" id="save-entry" class="btn btn-primary">Save this to my tracker</button>
+          <button type="button" id="save-entry" class="btn btn-primary">
+            Save this to my tracker
+          </button>
         </div>
       </section>
     </main>
@@ -256,15 +334,14 @@
     <footer class="site-footer">
       <div class="wrap">
         <p>
-          <strong>How this works:</strong> EcoTrack multiplies your inputs by
-          published average emission factors (DEFRA, IEA, Our World in Data) to
-          estimate your yearly CO₂e, then builds an interactive plan ranked by
-          impact for <em>your</em> situation. Figures are estimates for guidance,
-          not audit-grade accounting.
+          <strong>How this works:</strong> EcoTrack multiplies your inputs by published average
+          emission factors (DEFRA, IEA, Our World in Data) to estimate your yearly CO₂e, then builds
+          an interactive plan ranked by impact for <em>your</em> situation. Figures are estimates
+          for guidance, not audit-grade accounting.
         </p>
         <p class="muted">
-          🔒 Privacy-first: everything runs in your browser. No account, no
-          servers, no tracking — your data never leaves your device.
+          🔒 Privacy-first: everything runs in your browser. No account, no servers, no tracking —
+          your data never leaves your device.
         </p>
       </div>
     </footer>

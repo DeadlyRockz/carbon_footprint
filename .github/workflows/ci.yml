@@ -7,8 +7,29 @@ on:
     branches: [main]
 
 jobs:
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dev tooling
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier (check formatting)
+        run: npm run format:check
+
   test:
-    name: Lint & test
+    name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,6 +42,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      # The app and its tests have zero runtime dependencies, so the test job
+      # needs no install step — it runs straight on Node's built-ins.
       - name: Syntax-check all source files
         run: |
           for f in $(find src scripts sw.js -name '*.js'); do

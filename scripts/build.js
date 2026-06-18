@@ -24,6 +24,7 @@ const ROOT = normalize(join(dirname(fileURLToPath(import.meta.url)), '..'));
 // Every browser module, keyed by its path under src/ (without extension).
 const MODULES = [
   'data/emissionFactors',
+  'core/math',
   'core/format',
   'core/calculator',
   'core/benchmarks',
@@ -53,18 +54,15 @@ function transform(key, source) {
 
   let body = source
     // Rewrite `import { a, b as c } from './x.js'` -> destructure from require.
-    .replace(
-      /import\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"];?/g,
-      (_match, names, spec) => {
-        const destructured = names
-          .split(',')
-          .map((n) => n.trim())
-          .filter(Boolean)
-          .map((n) => n.replace(/\s+as\s+/, ': '))
-          .join(', ');
-        return `const { ${destructured} } = __require('${resolveKey(key, spec)}');`;
-      },
-    )
+    .replace(/import\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"];?/g, (_match, names, spec) => {
+      const destructured = names
+        .split(',')
+        .map((n) => n.trim())
+        .filter(Boolean)
+        .map((n) => n.replace(/\s+as\s+/, ': '))
+        .join(', ');
+      return `const { ${destructured} } = __require('${resolveKey(key, spec)}');`;
+    })
     // Drop the `export ` keyword; the bindings are collected separately.
     .replace(/export\s+(const|let|var|function|class)\b/g, '$1');
 

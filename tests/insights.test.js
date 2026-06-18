@@ -1,7 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createDefaultProfile, calculateFootprint, rankCategories } from '../src/core/calculator.js';
+import {
+  createDefaultProfile,
+  calculateFootprint,
+  rankCategories,
+} from '../src/core/calculator.js';
 import { recommend } from '../src/core/recommendations.js';
 import { goalStatus } from '../src/core/planner.js';
 import { coachingNote, goalMessage, progressMessage } from '../src/core/insights.js';

@@ -7,6 +7,7 @@
  */
 
 import { BENCHMARKS } from '../data/emissionFactors.js';
+import { roundTo as round } from './math.js';
 
 /**
  * Rating bands keyed off the per-capita climate targets. Ordered best-to-worst;
@@ -79,9 +80,4 @@ export function headline(summary) {
   const direction = vsGlobalAverage >= 1 ? 'above' : 'below';
   const pct = Math.round(Math.abs(vsGlobalAverage - 1) * 100);
   return `Your estimated footprint is ${tonnes} t CO₂e a year — about ${pct}% ${direction} the global average. To meet the 2030 target you'd cut roughly ${summary.gapToParis2030.toLocaleString()} kg.`;
-}
-
-function round(n, dp = 1) {
-  const f = 10 ** dp;
-  return Math.round(n * f) / f;
 }
