@@ -27,5 +27,11 @@ jobs:
             node --check "$f"
           done
 
+      - name: Verify the committed bundle matches source
+        run: |
+          npm run build
+          git diff --exit-code app.bundle.js \
+            || (echo "::error::app.bundle.js is stale — run 'npm run build' and commit." && exit 1)
+
       - name: Run unit tests
         run: npm test

@@ -41,15 +41,23 @@ you change your goal.
 
 ## 🚀 Run it
 
-No build step and **zero runtime dependencies**.
+**Zero runtime dependencies.** Two ways to run it:
 
 ```bash
-# Start the bundled static server (Node 18+) — or just open index.html
+# Option 1 — just open it: double-click index.html (works from file://)
+
+# Option 2 — serve it (Node 18+)
 npm start          # → http://localhost:4173
 
 # Run the test suite (55 unit + integration tests, Node's built-in runner)
 npm test
 ```
+
+> The browser loads `app.bundle.js`, a classic script generated from the ES
+> modules in `src/` so the app works when opened directly **and** when served.
+> After editing anything in `src/`, regenerate it with `npm run build` (the
+> committed bundle is checked for staleness in CI). The ES modules remain the
+> source of truth — the test suite imports them directly.
 
 ---
 

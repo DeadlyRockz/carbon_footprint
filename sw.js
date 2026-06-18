@@ -8,25 +8,15 @@
  * Bump CACHE_VERSION whenever shell assets change to retire the old cache.
  */
 
-const CACHE_VERSION = 'ecotrack-v1';
+const CACHE_VERSION = 'ecotrack-v2';
 
 const APP_SHELL = [
   './',
   './index.html',
+  './app.bundle.js',
   './manifest.webmanifest',
   './icon.svg',
   './src/styles.css',
-  './src/app.js',
-  './src/presets.js',
-  './src/chart.js',
-  './src/data/emissionFactors.js',
-  './src/core/calculator.js',
-  './src/core/benchmarks.js',
-  './src/core/recommendations.js',
-  './src/core/planner.js',
-  './src/core/insights.js',
-  './src/core/storage.js',
-  './src/core/format.js',
 ];
 
 self.addEventListener('install', (event) => {

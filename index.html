@@ -269,6 +269,11 @@
       </div>
     </footer>
 
-    <script type="module" src="./src/app.js"></script>
+    <!--
+      Loads the bundled classic script so the app works when opened directly
+      (file://) as well as over http. The bundle is generated from the ES
+      modules in src/ via `npm run build`; src/ remains the source of truth.
+    -->
+    <script defer src="./app.bundle.js"></script>
   </body>
 </html>
